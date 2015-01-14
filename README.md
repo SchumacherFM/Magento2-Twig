@@ -8,6 +8,18 @@ Frontend Integration
 
 Your template files must have the file extension `.twig` to get automatically recognized.
 
+In your layout xml files please specify the new template
+
+```
+<referenceBlock name="top.links">
+    <block class="Magento\Theme\Block\Html\Header" name="header" as="header" before="-" template="html/header.twig">
+        <arguments>
+            <argument name="show_part" xsi:type="string">welcome dude</argument>
+        </arguments>
+    </block>
+</referenceBlock>
+```
+
 Tests
 -----
 
