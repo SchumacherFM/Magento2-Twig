@@ -1,0 +1,30 @@
+{
+    "name": "schumacherfm/mage2-twig",
+    "description": "Twig for Magento2",
+    "require": {
+        "php": "~5.4.11|~5.5.0|~5.6.0",
+        "magento/framework": "*",
+        "magento/magento-composer-installer": "*",
+        "twig/twig": "~1.17.0"
+    },
+    "type": "magento2-module",
+    "version": "0.1.0",
+    "license": [
+        "OSL-3"
+    ],
+    "extra": {
+        "map": [
+            [
+                "*",
+                "SchumacherFM/Twig"
+            ]
+        ]
+    },
+    "authors": [
+        {
+            "name": "Cyrill Schumacher",
+            "homepage": "http://cyrillschumacher.com/",
+            "role": "Developer"
+        }
+    ]
+}

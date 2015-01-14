@@ -1,0 +1,8 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/magento/magento2/master/lib/internal/Magento/Framework/Module/etc/module.xsd">
+    <module name="SchumacherFM_Twig" schema_version="0">
+        <sequence>
+            <module name="Magento_Core"/>
+        </sequence>
+    </module>
+</config>
