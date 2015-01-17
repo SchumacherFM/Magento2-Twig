@@ -12,12 +12,43 @@ In your layout xml files please specify the new template
 
 ```
 <referenceBlock name="top.links">
-    <block class="Magento\Theme\Block\Html\Header" name="header" as="header" before="-" template="html/header.twig">
+    <block class="Magento\Theme\Block\Html\Header" template="html/header.twig" name="header" as="header" before="-">
         <arguments>
             <argument name="show_part" xsi:type="string">welcome dude</argument>
         </arguments>
     </block>
 </referenceBlock>
+```
+
+#### Access helper methods
+
+Write in your `.twig` file:
+
+```
+{{ helper("Magento\\Core\\Helper\\Url").getHomeUrl() }}
+```
+
+#### Example header.phtml converted to header.twig
+
+```
+<?php switch ($this->getShowPart()):
+    case 'welcome': ?>
+        <li class="greet welcome"><?php echo $this->getWelcome() ?></li>
+    <?php break; ?>
+    <?php case 'other': ?>
+        <?php echo $this->getChildHtml(); ?>
+    <?php break; ?>
+<?php endswitch; ?>
+```
+
+```
+{% if getShowPart() == 'welcome' %}
+    <li class="greet welcome">{{ getWelcome() }}</li>
+{% endif %}
+
+{% if getShowPart() == 'other' %}
+    {{ getChildHtml() }}
+{% endif %}
 ```
 
 Tests
