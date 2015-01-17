@@ -4,11 +4,18 @@ namespace SchumacherFM\Twig\Framework\View\TemplateEngine;
 
 use Magento\Framework\View\TemplateEngine\Php,
     Magento\Framework\App\Filesystem\DirectoryList,
-    \Magento\Framework\ObjectManagerInterface;
+    Magento\Framework\ObjectManagerInterface,
+    Magento\Framework\App\Config\ScopeConfigInterface,
+    Magento\Framework\Event\ManagerInterface;
 
 class Twig extends Php
 {
     const TWIG_CACHE_DIR = 'twig';
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $_scopeConfig;
 
     /**
      * @var \Twig_Environment
@@ -21,12 +28,28 @@ class Twig extends Php
     protected $_directoryList;
 
     /**
+     * Event manager
+     *
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      * @param ObjectManagerInterface $helperFactory
      * @param DirectoryList $directoryList
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerInterface $eventManager
      */
-    public function __construct(ObjectManagerInterface $helperFactory, DirectoryList $directoryList) {
+    public function __construct(
+        ObjectManagerInterface $helperFactory,
+        DirectoryList $directoryList,
+        ScopeConfigInterface $scopeConfig,
+        ManagerInterface $eventManager
+    ) {
         parent::__construct($helperFactory);
         $this->_directoryList = $directoryList;
+        $this->_scopeConfig = $scopeConfig;
+        $this->eventManager = $eventManager;
         $this->initTwig();
     }
 
@@ -35,20 +58,44 @@ class Twig extends Php
      */
     private function initTwig() {
         \Twig_Autoloader::register();
-        // @todo let users configure the loader. Redis! clear twig cache
 
-        $loader = new \Twig_Loader_Filesystem($this->_directoryList->getPath(DirectoryList::ROOT));
-
-        $this->twig = new \Twig_Environment($loader, [
+        $this->twig = new \Twig_Environment($this->getLoader(), [
             // make it configurable http://twig.sensiolabs.org/doc/api.html#environment-options
-            'cache' => $this->_directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::TWIG_CACHE_DIR,
-            'debug' => true,
+            'cache' => $this->getCachePath(),
+            'debug' => $this->_scopeConfig->isSetFlag('dev/twig/debug'),
+            'auto_reload' => $this->_scopeConfig->isSetFlag('dev/twig/auto_reload'),
+            'strict_variables' => $this->_scopeConfig->isSetFlag('dev/twig/strict_variables'),
+            'charset' => $this->_scopeConfig->getValue('dev/twig/charset'),
         ]);
 
         $this->twig->addFunction(new \Twig_SimpleFunction('helper', [$this, 'helper']));
         $this->twig->addFunction(new \Twig_SimpleFunction('block', [$this, '__call']));
         $this->twig->addFunction(new \Twig_SimpleFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig_SimpleFunction('isset', [$this, '__isset']));
+
+        $this->eventManager->dispatch('twig_init', ['twig' => $this->twig]);
+    }
+
+    /**
+     * @return \Twig_LoaderInterface
+     */
+    private function getLoader() {
+        $loader = new \stdClass();
+        $this->eventManager->dispatch('twig_loader', ['loader' => $loader]);
+        if (false === ($loader instanceof \Twig_LoaderInterface)) {
+            $loader = new \Twig_Loader_Filesystem($this->_directoryList->getPath(DirectoryList::ROOT));
+        }
+        return $loader;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCachePath() {
+        if (false === $this->_scopeConfig->isSetFlag('dev/twig/cache')) {
+            return false;
+        }
+        return $this->_directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::TWIG_CACHE_DIR;
     }
 
     /**
@@ -71,11 +118,7 @@ class Twig extends Php
      * @param array $dictionary
      * @return string rendered template
      */
-    public function render(
-        \Magento\Framework\View\Element\BlockInterface $block,
-        $fileName,
-        array $dictionary = []
-    ) {
+    public function render(\Magento\Framework\View\Element\BlockInterface $block, $fileName, array $dictionary = []) {
         $this->_currentBlock = $block;
         return $this->getTemplate($fileName)->render($dictionary);
     }

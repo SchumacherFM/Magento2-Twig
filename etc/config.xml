@@ -2,10 +2,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/magento/magento2/master/app/code/Magento/Core/etc/config.xsd">
     <default>
-        <system>
-            <schumacherfm_twig>
-
-            </schumacherfm_twig>
-        </system>
+        <dev>
+            <twig>
+                <cache>1</cache>
+                <charset>utf-8</charset>
+                <strict_variables>1</strict_variables>
+            </twig>
+        </dev>
     </default>
 </config>
