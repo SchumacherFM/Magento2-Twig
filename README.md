@@ -1,9 +1,13 @@
-Magento2-Twig
+Magento2 Twig Template Engine
 ============
 
-Twig template engine for Magento2.
+[Twig](http://twig.sensiolabs.org) template engine for Magento2.
 
-[Twig documentation](http://twig.sensiolabs.org/documentation)
+This template engine is meant to be used additionally to the `.phtml` files and does not 
+provide any `.twig` template file.
+
+A use case would be if you write your first Magento2 module you can require this package
+and write all your template files in Twig.
 
 Events & Configuration
 -------------
