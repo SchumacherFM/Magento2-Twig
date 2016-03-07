@@ -12,19 +12,19 @@
     "license": [
         "OSL-3"
     ],
-    "extra": {
-        "map": [
-            [
-                "*",
-                "SchumacherFM/Twig"
-            ]
-        ]
-    },
     "authors": [
         {
             "name": "Cyrill Schumacher",
             "homepage": "http://cyrillschumacher.com/",
             "role": "Developer"
         }
-    ]
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "SchumacherFM\\Twig\\": ""
+        }
+    }
 }
