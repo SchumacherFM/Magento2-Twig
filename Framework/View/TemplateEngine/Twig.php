@@ -65,7 +65,8 @@ class Twig extends Php
      */
     private function initTwig()
     {
-        \Twig_Autoloader::register();
+        //removed Twig_Autoloader. Not needed for Twig v2.0 and up
+        //\Twig_Autoloader::register();
 
         $this->twig = new \Twig_Environment($this->getLoader(), [
             // make it configurable http://twig.sensiolabs.org/doc/api.html#environment-options
