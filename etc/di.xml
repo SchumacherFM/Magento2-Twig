@@ -7,4 +7,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\Template">
+        <plugin name="convert_to_twig" type="SchumacherFM\Twig\Plugin\TemplatePlugin" sortOrder="0" />
+    </type>
 </config>
