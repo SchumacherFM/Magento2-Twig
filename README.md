@@ -58,7 +58,7 @@ In your layout xml files or blocks please specify the new template
 {% endif %}
 
 {% if getShowPart() == 'other' %}
-    {{ getChildHtml() }}
+    {{ getChildHtml()|raw }}
 {% endif %}
 ```
 
