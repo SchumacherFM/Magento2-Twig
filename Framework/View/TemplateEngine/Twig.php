@@ -82,6 +82,8 @@ class Twig extends Php
         $this->twig->addFunction(new \Twig_SimpleFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig_SimpleFunction('isset', [$this, '__isset']));
 
+        $this->twig->addExtension(new \Twig_Extension_Debug());
+
         foreach ($this->get_defined_functions_in_helpers_file() as $functionName) {
             $this->twig->addFunction(new \Twig_SimpleFunction($functionName, $functionName));
         }
