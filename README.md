@@ -126,7 +126,7 @@ Installation via Composer
 
 Add the following to the require section of your Magento 2 `composer.json` file
 
-    "schumacherfm/mage2-twig": "dev-master"
+    "schumacherfm/magento-twig": "dev-master"
 
 additionally add the following in the repository section
 
