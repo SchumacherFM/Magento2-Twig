@@ -147,9 +147,12 @@ class Twig extends Php
      */
     public function render(BlockInterface $block, $fileName, array $dictionary = [])
     {
+        $tmpBlock = $this->_currentBlock;
         $this->_currentBlock = $block;
-
-        return $this->getTemplate($fileName)->render($dictionary);
+        $result = $this->getTemplate($fileName)->render($dictionary);
+        $this->_currentBlock = $tmpBlock;
+        
+        return $result;
     }
 
     /**
