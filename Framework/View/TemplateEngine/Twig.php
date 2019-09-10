@@ -81,6 +81,8 @@ class Twig extends Php
         $this->twig->addFunction(new \Twig_SimpleFunction('layoutBlock', [$this, '__call']));
         $this->twig->addFunction(new \Twig_SimpleFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig_SimpleFunction('isset', [$this, '__isset']));
+        $this->twig->addFilter(new \Twig_SimpleFilter('trans', '__'));
+
 
         $this->twig->addExtension(new \Twig_Extension_Debug());
 
