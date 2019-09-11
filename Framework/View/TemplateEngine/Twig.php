@@ -78,9 +78,11 @@ class Twig extends Php
         ]);
 
         $this->twig->addFunction(new \Twig_SimpleFunction('helper', [$this, 'helper']));
-        $this->twig->addFunction(new \Twig_SimpleFunction('block', [$this, '__call']));
+        $this->twig->addFunction(new \Twig_SimpleFunction('layoutBlock', [$this, '__call']));
         $this->twig->addFunction(new \Twig_SimpleFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig_SimpleFunction('isset', [$this, '__isset']));
+        $this->twig->addFilter(new \Twig_SimpleFilter('trans', '__'));
+
 
         $this->twig->addExtension(new \Twig_Extension_Debug());
 
@@ -147,9 +149,12 @@ class Twig extends Php
      */
     public function render(BlockInterface $block, $fileName, array $dictionary = [])
     {
+        $tmpBlock = $this->_currentBlock;
         $this->_currentBlock = $block;
-
-        return $this->getTemplate($fileName)->render($dictionary);
+        $result = $this->getTemplate($fileName)->render($dictionary);
+        $this->_currentBlock = $tmpBlock;
+        
+        return $result;
     }
 
     /**
