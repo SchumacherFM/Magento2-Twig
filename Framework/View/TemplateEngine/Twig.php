@@ -1,5 +1,7 @@
 <?php
+
 namespace SchumacherFM\Twig\Framework\View\TemplateEngine;
+
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\View\TemplateEngine\Php;
@@ -7,6 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\View\Element\BlockInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+
 class Twig extends Php
 {
     const TWIG_CACHE_DIR = 'twig';
@@ -28,11 +31,12 @@ class Twig extends Php
      * @var \Magento\Framework\Event\ManagerInterface
      */
     protected $eventManager;
+
     /**
      * @param ObjectManagerInterface $helperFactory
-     * @param DirectoryList          $directoryList
-     * @param ScopeConfigInterface   $scopeConfig
-     * @param ManagerInterface       $eventManager
+     * @param DirectoryList $directoryList
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerInterface $eventManager
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
@@ -41,7 +45,8 @@ class Twig extends Php
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
         \Twig\Environment $twig
-    ) {
+    )
+    {
         parent::__construct($helperFactory);
         $this->_directoryList = $directoryList;
         $this->_scopeConfig = $scopeConfig;
@@ -49,6 +54,7 @@ class Twig extends Php
         $this->twig = $twig;
         $this->initTwig();
     }
+
     /**
      * Initialises Twig with all Magento 2 necessary functions
      *
@@ -79,11 +85,12 @@ class Twig extends Php
         $this->twig->addFunction(new \Twig\TwigFunction('isset', [$this, '__isset']));
         $this->twig->addFilter(new \Twig\TwigFilter('trans', '__'));
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
-        foreach ($this->get_defined_functions_in_helpers_file() as $functionName) {
+        foreach ($this->getDefinedFunctionsInHelpersFile() as $functionName) {
             $this->twig->addFunction(new \Twig\TwigFunction($functionName, $functionName));
         }
         $this->eventManager->dispatch('twig_init', ['twig' => $this->twig]);
     }
+
     /**
      * @return \Twig_LoaderInterface
      * @throws \Magento\Framework\Exception\FileSystemException
@@ -97,6 +104,7 @@ class Twig extends Php
         }
         return $loader;
     }
+
     /**
      * @return string
      * @throws \Magento\Framework\Exception\FileSystemException
@@ -108,6 +116,7 @@ class Twig extends Php
         }
         return $this->_directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::TWIG_CACHE_DIR;
     }
+
     /**
      * @return mixed
      */
@@ -117,14 +126,15 @@ class Twig extends Php
         $name = array_shift($args);
         return $this->__call('get' . $name, $args);
     }
+
     /**
      * Render template
      * Render the named template in the context of a particular block and with
      * the data provided in $vars.
      *
      * @param BlockInterface $block
-     * @param string         $fileName
-     * @param array          $dictionary
+     * @param string $fileName
+     * @param array $dictionary
      * @return string rendered template
      * @throws \Magento\Framework\Exception\FileSystemException
      * @throws \Twig_Error_Loader
@@ -139,6 +149,7 @@ class Twig extends Php
         $this->_currentBlock = $tmpBlock;
         return $result;
     }
+
     /**
      * @param $fileName
      * @return \Twig_TemplateInterface
@@ -152,6 +163,7 @@ class Twig extends Php
         $tf = str_replace($this->_directoryList->getPath(DirectoryList::ROOT) . DIRECTORY_SEPARATOR, '', $fileName);
         return $this->twig->loadTemplate($tf);
     }
+
     /**
      * Get helper singleton
      *
@@ -167,11 +179,12 @@ class Twig extends Php
         }
         return $helper;
     }
+
     /**
      * @return array
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    private function get_defined_functions_in_helpers_file()
+    private function getDefinedFunctionsInHelpersFile()
     {
         $filepath = $this->_directoryList->getPath(DirectoryList::APP) . '/functions.php';
         $source = file_get_contents($filepath);
@@ -180,16 +193,18 @@ class Twig extends Php
         $nextStringIsFunc = false;
         $inClass = false;
         $bracesCount = 0;
-        foreach($tokens as $token) {
-            switch($token[0]) {
+        foreach ($tokens as $token) {
+            switch ($token[0]) {
                 case T_CLASS:
                     $inClass = true;
                     break;
                 case T_FUNCTION:
-                    if(!$inClass) $nextStringIsFunc = true;
+                    if (!$inClass) {
+                        $nextStringIsFunc = true;
+                    }
                     break;
                 case T_STRING:
-                    if($nextStringIsFunc) {
+                    if ($nextStringIsFunc) {
                         $nextStringIsFunc = false;
                         $functions[] = $token[1];
                     }
@@ -201,12 +216,14 @@ class Twig extends Php
                     break;
                 // Exclude Classes
                 case '{':
-                    if($inClass) $bracesCount++;
+                    if ($inClass) $bracesCount++;
                     break;
                 case '}':
-                    if($inClass) {
+                    if ($inClass) {
                         $bracesCount--;
-                        if($bracesCount === 0) $inClass = false;
+                        if ($bracesCount === 0) {
+                            $inClass = false;
+                        }
                     }
                     break;
             }
