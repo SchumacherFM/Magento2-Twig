@@ -7,6 +7,15 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Twig\Loader\FilesystemLoader">
+        <arguments>
+            <argument name="paths" xsi:type="string">../</argument>
+        </arguments>
+    </type>
+
+    <preference for="Twig\Loader\LoaderInterface" type="Twig\Loader\FilesystemLoader"/>
+
     <type name="Magento\Framework\View\Element\Template">
         <plugin name="convert_to_twig" type="SchumacherFM\Twig\Plugin\TemplatePlugin" sortOrder="0" />
     </type>
