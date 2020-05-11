@@ -4,9 +4,18 @@ namespace SchumacherFM\Twig\Twig\Loader;
 
 class FilesystemLoader extends \Twig\Loader\FilesystemLoader
 {
-    
-    public function __construct($paths = [], \Magento\Framework\Filesystem\DirectoryList $directoryList)
+
+    protected $directoryList;
+
+    protected $resolver;
+
+    public function __construct(
+        \Magento\Framework\Filesystem\DirectoryList $directoryList,
+        \Magento\Framework\View\Element\Template\File\Resolver $resolver,
+        $paths = [])
     {
+        $this->directoryList = $directoryList;
+        $this->resolver = $resolver;
         $paths[] = './';
         parent::__construct($paths, $directoryList->getRoot());
     }
@@ -21,5 +30,6 @@ class FilesystemLoader extends \Twig\Loader\FilesystemLoader
             return parent::findTemplate($name, $throw);
         }
     }
-    
+
 }
+
