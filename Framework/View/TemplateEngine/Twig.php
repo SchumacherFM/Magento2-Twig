@@ -120,9 +120,8 @@ class Twig extends Php
     /**
      * @return mixed
      */
-    public function catchGet()
+    public function catchGet(...$args)
     {
-        $args = func_get_args();
         $name = array_shift($args);
         return $this->__call('get' . $name, $args);
     }
