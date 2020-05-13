@@ -2,7 +2,7 @@
 
 namespace SchumacherFM\Twig\Twig\Loader;
 
-use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\View\Element\Template\File\Resolver;
 
 class FilesystemLoader extends \Twig\Loader\FilesystemLoader
