@@ -80,7 +80,7 @@ class Twig extends Php
         }
         $this->twig->setCharset($this->_scopeConfig->getValue('dev/twig/charset'));
         $this->twig->addFunction(new \Twig\TwigFunction('helper', [$this, 'helper']));
-        $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, 'layoutblock']));
+        $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, 'layoutBlock']));
         $this->twig->addFunction(new \Twig\TwigFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig\TwigFunction('isset', [$this, '__isset']));
         $this->twig->addFilter(new \Twig\TwigFilter('trans', '__'));
