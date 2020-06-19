@@ -80,7 +80,7 @@ class Twig extends Php
         }
         $this->twig->setCharset($this->_scopeConfig->getValue('dev/twig/charset'));
         $this->twig->addFunction(new \Twig\TwigFunction('helper', [$this, 'helper']));
-        $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, '__call']));
+        $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, 'layoutblock']));
         $this->twig->addFunction(new \Twig\TwigFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig\TwigFunction('isset', [$this, '__isset']));
         $this->twig->addFilter(new \Twig\TwigFilter('trans', '__'));
@@ -127,6 +127,17 @@ class Twig extends Php
     }
 
     /**
+     * @param $method
+     * @param $args
+     * @deprecated since 1.7
+     */
+    public function layoutBlock($method, $args)
+    {
+        @trigger_error(sprintf('Using the "layoutBlock" function in twig is deprecated since version 1.7, use the "block" variable instead.'), E_USER_DEPRECATED);
+        return $this->__call($method, $args);
+    }
+
+    /**
      * Render template
      * Render the named template in the context of a particular block and with
      * the data provided in $vars.
@@ -144,6 +155,7 @@ class Twig extends Php
     {
         $tmpBlock = $this->_currentBlock;
         $this->_currentBlock = $block;
+        $this->twig->addGlobal('block', $block);
         $result = $this->getTemplate($fileName)->render($dictionary);
         $this->_currentBlock = $tmpBlock;
         return $result;
