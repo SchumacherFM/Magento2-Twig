@@ -9,10 +9,12 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\View\Element\BlockInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Twig\Environment;
 
 class Twig extends Php
 {
     const TWIG_CACHE_DIR = 'twig';
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -34,9 +36,11 @@ class Twig extends Php
 
     /**
      * @param ObjectManagerInterface $helperFactory
-     * @param DirectoryList $directoryList
-     * @param ScopeConfigInterface $scopeConfig
-     * @param ManagerInterface $eventManager
+     * @param DirectoryList          $directoryList
+     * @param ScopeConfigInterface   $scopeConfig
+     * @param ManagerInterface       $eventManager
+     * @param Environment      $twig
+     *
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
@@ -44,7 +48,7 @@ class Twig extends Php
         DirectoryList $directoryList,
         ScopeConfigInterface $scopeConfig,
         ManagerInterface $eventManager,
-        \Twig\Environment $twig
+        Environment $twig
     )
     {
         parent::__construct($helperFactory);
@@ -92,7 +96,7 @@ class Twig extends Php
     }
 
     /**
-     * @return \Twig_LoaderInterface
+     * @return \Twig\Loader\LoaderInterface
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     private function getLoader()
@@ -129,7 +133,9 @@ class Twig extends Php
     /**
      * @param $method
      * @param $args
+     *
      * @deprecated since 1.7
+     * @return mixed
      */
     public function layoutBlock($method, $args)
     {
@@ -147,9 +153,9 @@ class Twig extends Php
      * @param array $dictionary
      * @return string rendered template
      * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function render(BlockInterface $block, $fileName, array $dictionary = [])
     {
@@ -163,16 +169,17 @@ class Twig extends Php
 
     /**
      * @param $fileName
-     * @return \Twig_TemplateInterface
+     *
+     * @return \Twig\TemplateWrapper
      * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     private function getTemplate($fileName)
     {
         $tf = str_replace($this->_directoryList->getPath(DirectoryList::ROOT) . DIRECTORY_SEPARATOR, '', $fileName);
-        return $this->twig->loadTemplate($tf);
+        return $this->twig->load($tf);
     }
 
     /**
