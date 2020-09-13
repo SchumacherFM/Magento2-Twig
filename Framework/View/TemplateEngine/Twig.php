@@ -4,6 +4,7 @@ namespace SchumacherFM\Twig\Framework\View\TemplateEngine;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\TemplateEngine\Php;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\View\Element\BlockInterface;
@@ -87,6 +88,11 @@ class Twig extends Php
         $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, 'layoutBlock']));
         $this->twig->addFunction(new \Twig\TwigFunction('get*', [$this, 'catchGet']));
         $this->twig->addFunction(new \Twig\TwigFunction('isset', [$this, '__isset']));
+        $this->twig->addFunction(new \Twig\TwigFunction('child_html', [$this, 'getChildHtml'], [
+            'needs_context' => true,
+            'is_safe' => ['html']
+        ]));
+
         $this->twig->addFilter(new \Twig\TwigFilter('trans', '__'));
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
         foreach ($this->getDefinedFunctionsInHelpersFile() as $functionName) {
@@ -196,6 +202,18 @@ class Twig extends Php
             throw new \LogicException($className . ' doesn\'t extends Magento\Framework\App\Helper\AbstractHelper');
         }
         return $helper;
+    }
+
+    public function getChildHtml(array $context, $alias = '', $useCache = true)
+    {
+        if (!isset($context['block'])) {
+            return null;
+        }
+        $block = $context['block'];
+        if (!$block instanceof AbstractBlock) {
+            return null;
+        }
+        return $block->getChildHtml($alias, $useCache);
     }
 
     /**
