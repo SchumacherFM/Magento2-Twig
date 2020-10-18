@@ -48,11 +48,6 @@ class Twig extends Php
     protected $eventManager;
 
     /**
-     * @var BlockInterface
-     */
-    protected $currentBlock;
-
-    /**
      * @param ObjectManagerInterface $helperFactory
      * @param DirectoryList          $directoryList
      * @param ScopeConfigInterface   $scopeConfig
@@ -151,11 +146,11 @@ class Twig extends Php
      */
     public function render(BlockInterface $block, $fileName, array $dictionary = [])
     {
-        $tmpBlock = $this->currentBlock;
-        $this->currentBlock = $block;
+        $tmpBlock = $this->_currentBlock;
+        $this->_currentBlock = $block;
         $this->twig->addGlobal('block', $block);
         $result = $this->getTemplate($fileName)->render($dictionary);
-        $this->currentBlock = $tmpBlock;
+        $this->_currentBlock = $tmpBlock;
         return $result;
     }
 
