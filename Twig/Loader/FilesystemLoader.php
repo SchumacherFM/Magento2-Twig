@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace SchumacherFM\Twig\Twig\Loader;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\View\Design\ThemeInterface;
 use Magento\Framework\View\DesignInterface;
 use Magento\Framework\View\Element\Template\File\Resolver;
 use Magento\Framework\View\File\Collector\Base;
@@ -105,7 +104,6 @@ class FilesystemLoader extends \Twig\Loader\FilesystemLoader
         }
 
         // Add Theme Namespaces
-        /** @var ThemeInterface[] $inheritedThemes */
         $inheritedThemes = $theme->getInheritedThemes();
         foreach ($inheritedThemes as $inheritanceLevel => $currentTheme) {
             $themeFiles = $this->themeFilesCollector->getFiles($currentTheme, 'templates');

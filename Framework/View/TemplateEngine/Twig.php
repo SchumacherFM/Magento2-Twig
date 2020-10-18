@@ -2,6 +2,8 @@
 
 namespace SchumacherFM\Twig\Framework\View\TemplateEngine;
 
+use LogicException;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\View\Element\AbstractBlock;
@@ -11,29 +13,44 @@ use Magento\Framework\View\Element\BlockInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Extension\DebugExtension;
+use Twig\TemplateWrapper;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class Twig extends Php
 {
     const TWIG_CACHE_DIR = 'twig';
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
+
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
-    private $twig = null;
+    protected $twig = null;
+
     /**
      * @var DirectoryList
      */
-    protected $_directoryList;
+    protected $directoryList;
+
     /**
      * Event manager
      *
-     * @var \Magento\Framework\Event\ManagerInterface
+     * @var ManagerInterface
      */
     protected $eventManager;
+
+    /**
+     * @var BlockInterface
+     */
+    protected $currentBlock;
 
     /**
      * @param ObjectManagerInterface $helperFactory
@@ -42,7 +59,7 @@ class Twig extends Php
      * @param ManagerInterface       $eventManager
      * @param Environment      $twig
      *
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     public function __construct(
         ObjectManagerInterface $helperFactory,
@@ -53,8 +70,8 @@ class Twig extends Php
     )
     {
         parent::__construct($helperFactory);
-        $this->_directoryList = $directoryList;
-        $this->_scopeConfig = $scopeConfig;
+        $this->directoryList = $directoryList;
+        $this->scopeConfig = $scopeConfig;
         $this->eventManager = $eventManager;
         $this->twig = $twig;
         $this->initTwig();
@@ -63,68 +80,50 @@ class Twig extends Php
     /**
      * Initialises Twig with all Magento 2 necessary functions
      *
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     private function initTwig()
     {
         $this->twig->setCache($this->getCachePath());
-        if ($this->_scopeConfig->isSetFlag('dev/twig/debug')) {
+        if ($this->scopeConfig->isSetFlag('dev/twig/debug')) {
             $this->twig->enableDebug();
         } else {
             $this->twig->disableDebug();
         }
-        if ($this->_scopeConfig->isSetFlag('dev/twig/auto_reload')) {
+        if ($this->scopeConfig->isSetFlag('dev/twig/auto_reload')) {
             $this->twig->enableAutoReload();
         } else {
             $this->twig->disableAutoReload();
         }
-        if ($this->_scopeConfig->isSetFlag('dev/twig/strict_variables')) {
+        if ($this->scopeConfig->isSetFlag('dev/twig/strict_variables')) {
             $this->twig->enableStrictVariables();
         } else {
             $this->twig->disableStrictVariables();
         }
-        $this->twig->setCharset($this->_scopeConfig->getValue('dev/twig/charset'));
-        $this->twig->addFunction(new \Twig\TwigFunction('helper', [$this, 'helper']));
-        $this->twig->addFunction(new \Twig\TwigFunction('layoutBlock', [$this, 'layoutBlock']));
-        $this->twig->addFunction(new \Twig\TwigFunction('get*', [$this, 'catchGet']));
-        $this->twig->addFunction(new \Twig\TwigFunction('isset', [$this, '__isset']));
-        $this->twig->addFunction(new \Twig\TwigFunction('child_html', [$this, 'getChildHtml'], [
+        $this->twig->setCharset($this->scopeConfig->getValue('dev/twig/charset'));
+        $this->twig->addFunction(new TwigFunction('helper', [$this, 'helper']));
+        $this->twig->addFunction(new TwigFunction('get*', [$this, 'catchGet']));
+        $this->twig->addFunction(new TwigFunction('isset', [$this, '__isset']));
+        $this->twig->addFunction(new TwigFunction('child_html', [$this, 'getChildHtml'], [
             'needs_context' => true,
             'is_safe' => ['html']
         ]));
 
-        $this->twig->addFilter(new \Twig\TwigFilter('trans', '__'));
-        $this->twig->addExtension(new \Twig\Extension\DebugExtension());
-        foreach ($this->getDefinedFunctionsInHelpersFile() as $functionName) {
-            $this->twig->addFunction(new \Twig\TwigFunction($functionName, $functionName));
-        }
+        $this->twig->addFilter(new TwigFilter('trans', '__'));
+        $this->twig->addExtension(new DebugExtension());
         $this->eventManager->dispatch('twig_init', ['twig' => $this->twig]);
     }
 
     /**
-     * @return \Twig\Loader\LoaderInterface
-     * @throws \Magento\Framework\Exception\FileSystemException
-     */
-    private function getLoader()
-    {
-        $loader = new \stdClass();
-        $this->eventManager->dispatch('twig_loader', ['loader' => $loader]);
-        if (false === ($loader instanceof \Twig\Loader\LoaderInterface)) {
-            $loader = new \Twig\Loader\FilesystemLoader($this->_directoryList->getPath(DirectoryList::ROOT));
-        }
-        return $loader;
-    }
-
-    /**
      * @return string
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     private function getCachePath()
     {
-        if (false === $this->_scopeConfig->isSetFlag('dev/twig/cache')) {
+        if (false === $this->scopeConfig->isSetFlag('dev/twig/cache')) {
             return false;
         }
-        return $this->_directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::TWIG_CACHE_DIR;
+        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . DIRECTORY_SEPARATOR . self::TWIG_CACHE_DIR;
     }
 
     /**
@@ -137,19 +136,6 @@ class Twig extends Php
     }
 
     /**
-     * @param $method
-     * @param $args
-     *
-     * @deprecated since 1.7
-     * @return mixed
-     */
-    public function layoutBlock($method, $args)
-    {
-        @trigger_error(sprintf('Using the "layoutBlock" function in twig is deprecated since version 1.7, use the "block" variable instead.'), E_USER_DEPRECATED);
-        return $this->__call($method, $args);
-    }
-
-    /**
      * Render template
      * Render the named template in the context of a particular block and with
      * the data provided in $vars.
@@ -158,33 +144,33 @@ class Twig extends Php
      * @param string $fileName
      * @param array $dictionary
      * @return string rendered template
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws FileSystemException
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(BlockInterface $block, $fileName, array $dictionary = [])
     {
-        $tmpBlock = $this->_currentBlock;
-        $this->_currentBlock = $block;
+        $tmpBlock = $this->currentBlock;
+        $this->currentBlock = $block;
         $this->twig->addGlobal('block', $block);
         $result = $this->getTemplate($fileName)->render($dictionary);
-        $this->_currentBlock = $tmpBlock;
+        $this->currentBlock = $tmpBlock;
         return $result;
     }
 
     /**
      * @param $fileName
      *
-     * @return \Twig\TemplateWrapper
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @return TemplateWrapper
+     * @throws FileSystemException
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function getTemplate($fileName)
     {
-        $tf = str_replace($this->_directoryList->getPath(DirectoryList::ROOT) . DIRECTORY_SEPARATOR, '', $fileName);
+        $tf = str_replace($this->directoryList->getPath(DirectoryList::ROOT) . DIRECTORY_SEPARATOR, '', $fileName);
         return $this->twig->load($tf);
     }
 
@@ -193,13 +179,13 @@ class Twig extends Php
      *
      * @param string $className
      * @return AbstractHelper
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function helper($className)
     {
         $helper = $this->_helperFactory->get($className);
         if (false === $helper instanceof AbstractHelper) {
-            throw new \LogicException($className . ' doesn\'t extends Magento\Framework\App\Helper\AbstractHelper');
+            throw new LogicException($className . ' doesn\'t extends Magento\Framework\App\Helper\AbstractHelper');
         }
         return $helper;
     }
@@ -216,54 +202,4 @@ class Twig extends Php
         return $block->getChildHtml($alias, $useCache);
     }
 
-    /**
-     * @return array
-     * @throws \Magento\Framework\Exception\FileSystemException
-     */
-    private function getDefinedFunctionsInHelpersFile()
-    {
-        $filepath = $this->_directoryList->getPath(DirectoryList::APP) . '/functions.php';
-        $source = file_get_contents($filepath);
-        $tokens = token_get_all($source);
-        $functions = array();
-        $nextStringIsFunc = false;
-        $inClass = false;
-        $bracesCount = 0;
-        foreach ($tokens as $token) {
-            switch ($token[0]) {
-                case T_CLASS:
-                    $inClass = true;
-                    break;
-                case T_FUNCTION:
-                    if (!$inClass) {
-                        $nextStringIsFunc = true;
-                    }
-                    break;
-                case T_STRING:
-                    if ($nextStringIsFunc) {
-                        $nextStringIsFunc = false;
-                        $functions[] = $token[1];
-                    }
-                    break;
-                // Anonymous functions
-                case '(':
-                case ';':
-                    $nextStringIsFunc = false;
-                    break;
-                // Exclude Classes
-                case '{':
-                    if ($inClass) $bracesCount++;
-                    break;
-                case '}':
-                    if ($inClass) {
-                        $bracesCount--;
-                        if ($bracesCount === 0) {
-                            $inClass = false;
-                        }
-                    }
-                    break;
-            }
-        }
-        return $functions;
-    }
 }

@@ -163,9 +163,12 @@ For versioning have a look at [Semantic Versioning 2.0.0](http://semver.org/)
 History
 -------
 
-#### 0.1.0
+#### 2.0.0
 
-- Initial release
+- Added Magento 2.4.0 compatibility
+- Removed helper functions from `app/functions.php` since the file is no longer available in Magento 2.4
+- Removed deprecated function `layoutBlock` from twig environment
+- Updated to twig to 3.0.* 
 
 License
 -------

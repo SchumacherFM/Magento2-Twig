@@ -2,39 +2,36 @@
 
 namespace SchumacherFM\Twig\Plugin;
 
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\File\Validator;
+
 /**
  * Class TemplatePlugin
  */
 class TemplatePlugin
 {
     /**
-     * @var \Magento\Framework\View\Element\Template\File\Validator
+     * @var Validator
      */
     protected $validator;
 
     /**
      * TemplatePlugin constructor.
      *
-     * @param \Magento\Framework\View\Element\Template\File\Validator $validator
+     * @param Validator $validator
      */
-    public function __construct(
-        \Magento\Framework\View\Element\Template\File\Validator $validator
-    )
+    public function __construct(Validator $validator)
     {
         $this->validator = $validator;
     }
 
     /**
-     * @param \Magento\Framework\View\Element\Template $subject
+     * @param Template $subject
      * @param callable $proceed
      * @param string $fileName
      * @return string
      */
-    public function aroundFetchView(
-        \Magento\Framework\View\Element\Template $subject,
-        callable $proceed,
-        string $fileName
-    ): string
+    public function aroundFetchView(Template $subject, callable $proceed, string $fileName): string
     {
         $twigFile = $subject->getTemplateFile(str_replace('.phtml', '.html.twig', $subject->getTemplate()));
 
