@@ -20,6 +20,8 @@ use Twig\Extension\DebugExtension;
 use Twig\TemplateWrapper;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Twig\Extra\String\StringExtension;
+
 
 class Twig extends Php
 {
@@ -106,6 +108,7 @@ class Twig extends Php
 
         $this->twig->addFilter(new TwigFilter('trans', '__'));
         $this->twig->addExtension(new DebugExtension());
+        $twig->addExtension(new StringExtension());
         $this->eventManager->dispatch('twig_init', ['twig' => $this->twig]);
     }
 
