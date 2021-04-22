@@ -108,7 +108,7 @@ class Twig extends Php
 
         $this->twig->addFilter(new TwigFilter('trans', '__'));
         $this->twig->addExtension(new DebugExtension());
-        $twig->addExtension(new StringExtension());
+        $this->twig->addExtension(new StringExtension());
         $this->eventManager->dispatch('twig_init', ['twig' => $this->twig]);
     }
 
