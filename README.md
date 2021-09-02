@@ -22,6 +22,11 @@ composer require schumacherfm/magento-twig
 bin/magento module:enable SchumacherFM_Twig
 ```
 
+3. Update the database entries
+```
+bin/magento setup:upgrade
+```
+
 Events & Configuration
 -------------
 
