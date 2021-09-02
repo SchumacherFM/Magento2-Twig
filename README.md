@@ -1,4 +1,4 @@
-Magento2 Twig Template Engine
+Magento 2 Twig Template Engine
 ============
 
 [Twig](http://twig.sensiolabs.org) template engine for Magento2.
@@ -8,6 +8,19 @@ provide any `.twig` template file.
 
 A use case would be if you write your first Magento2 module you can require this package
 and write all your template files in Twig.
+
+
+Installation
+------------
+1. Add dependency
+```
+composer require schumacherfm/magento-twig
+```
+
+2. Enable the module
+```
+bin/magento module:enable SchumacherFM_Twig
+```
 
 Events & Configuration
 -------------
@@ -121,34 +134,6 @@ Tests
 
 @todo
 
-Installation via Composer
-------------
-
-Add the following to the require section of your Magento 2 `composer.json` file
-
-    "schumacherfm/magento-twig": "dev-master"
-
-additionally add the following in the repository section
-
-        "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/SchumacherFM/Magento2-Twig.git"
-        }
-    ]
-    
-run `composer update`
-
-add the following to `app/etc/config.php`
-
-    'SchumacherFM_Twig'=>1
-
-Compatibility
--------------
-
-- Magento >= 2
-- php >= 5.4.0
-
 Support / Contribution
 ----------------------
 
@@ -169,6 +154,12 @@ History
 - Removed helper functions from `app/functions.php` since the file is no longer available in Magento 2.4
 - Removed deprecated function `layoutBlock` from twig environment
 - Updated to twig to 3.0.* 
+
+Compatibility
+-------------
+
+- Magento >= 2
+- php >= 5.4.0
 
 License
 -------
