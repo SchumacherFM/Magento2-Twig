@@ -47,7 +47,7 @@ Your template files must have the file extension `.twig` to get automatically re
 
 In your layout xml files or blocks please specify the new template
 
-```
+```xml
 <referenceBlock name="top.links">
     <block class="Magento\Theme\Block\Html\Header" template="html/header.twig" name="header" as="header" before="-">
         <arguments>
@@ -59,7 +59,7 @@ In your layout xml files or blocks please specify the new template
 
 #### Example header.phtml converted to header.twig
 
-```
+```php
 <?php switch ($this->getShowPart()):
     case 'welcome': ?>
         <li class="greet welcome"><?php echo $this->getWelcome() ?></li>
@@ -70,7 +70,7 @@ In your layout xml files or blocks please specify the new template
 <?php endswitch; ?>
 ```
 
-```
+```twig
 {% if getShowPart() == 'welcome' %}
     <li class="greet welcome">{{ getWelcome() }}</li>
 {% endif %}
@@ -82,7 +82,7 @@ In your layout xml files or blocks please specify the new template
 
 #### Example breadcrumbs.phtml converted to breadcrumbs.twig
 
-```
+```php
 <?php if ($crumbs && is_array($crumbs)) : ?>
 <div class="breadcrumbs">
     <ul class="items">
@@ -104,7 +104,7 @@ In your layout xml files or blocks please specify the new template
 <?php endif; ?>
 ```
 
-```
+```twig
 {% if crumbs %}
 <div class="breadcrumbs">
     <ul class="items">
@@ -130,7 +130,7 @@ In your layout xml files or blocks please specify the new template
 
 Write in your `.twig` file:
 
-```
+```twig
 {{ helper("Magento\\Core\\Helper\\Url").getHomeUrl() }}
 ```
 
