@@ -105,6 +105,7 @@ class Twig extends Php
             'needs_context' => true,
             'is_safe' => ['html']
         ]));
+        $this->twig->addFunction(new TwigFunction('scope_config', [$this->scopeConfig, 'getValue']));
 
         $this->twig->addFilter(new TwigFilter('trans', '__'));
         $this->twig->addExtension(new DebugExtension());
