@@ -105,6 +105,10 @@ class Twig extends Php
             'needs_context' => true,
             'is_safe' => ['html']
         ]));
+        $this->twig->addFunction(new TwigFunction('cms_block', [$this, 'renderCmsBlock'], [
+            'needs_context' => true,
+            'is_safe' => ['html']
+        ]));
         $this->twig->addFunction(new TwigFunction('scope_config', [$this->scopeConfig, 'getValue']));
 
         $this->twig->addFilter(new TwigFilter('trans', '__'));
@@ -199,6 +203,21 @@ class Twig extends Php
             return null;
         }
         return $block->getChildHtml($alias, $useCache);
+    }
+    
+    public function renderCmsBlock(array $context, string $cmsBlockId)
+    {
+        if (!isset($context['block'])) {
+            return null;
+        }
+        $block = $context['block'];
+        if (!$block instanceof AbstractBlock) {
+            return null;
+        }
+        /** @var \Magento\Cms\Block\Block $cmsBlock */
+        $cmsBlock = $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class);
+        $cmsBlock->setBlockId($cmsBlockId);
+        return $cmsBlock->toHtml();
     }
 
 }
