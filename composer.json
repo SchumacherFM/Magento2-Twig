@@ -2,15 +2,15 @@
     "name": "schumacherfm/magento-twig",
     "description": "Twig template engine for Magento 2",
     "require": {
-        "php": "~7.2.0|~7.3.0|~7.4.0",
+        "php": ">=7.2",
         "magento/framework": ">=100.0.0",
         "magento/module-backend": ">=100.0.0",
         "magento/module-config": ">=100.0.0",
-        "twig/twig": "^3.0",
-        "twig/string-extra":"^3.3"
+        "twig/twig": "^3.4",
+        "twig/string-extra":"^3.4"
     },
     "type": "magento2-module",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "license": [
         "OSL-3.0"
     ],
