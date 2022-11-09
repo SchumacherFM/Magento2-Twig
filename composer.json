@@ -1,5 +1,5 @@
 {
-    "name": "schumacherfm/magento-twig2",
+    "name": "schumacherfm/magento-twig",
     "description": "Twig template engine for Magento 2",
     "require": {
         "php": ">=7.2",
